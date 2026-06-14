@@ -74,9 +74,17 @@ export async function POST(req) {
     const user = await verifyAuth(token);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { message, history, province, chatId } = await req.json();
-
     const db = getDb();
+
+    // Check if user exists in DB (Render free tier wipes DB on restart)
+    const userExists = db.prepare('SELECT id FROM users WHERE id = ?').get(user.id);
+    if (!userExists) {
+      const response = NextResponse.json({ error: 'Session expired or database reset. Please login again.' }, { status: 401 });
+      response.cookies.delete('auth_token');
+      return response;
+    }
+
+    const { message, history, province, chatId } = await req.json();
     let activeChatId = chatId;
 
     if (!activeChatId) {

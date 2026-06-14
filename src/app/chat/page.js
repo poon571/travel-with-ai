@@ -291,6 +291,11 @@ export default function ChatPage() {
         }
       } else {
         console.error(data.error);
+        if (response.status === 401) {
+          alert('⚠️ เซสชั่นหมดอายุหรือฐานข้อมูลถูกรีเซ็ต (Render Free Tier) ระบบจะพากลับไปหน้าล็อคอินให้ครับ');
+          router.push('/login');
+          return;
+        }
         setMessages((prev) => [...prev, { role: "ai", text: `⚠️ ${data.error || "ขออภัย เกิดข้อผิดพลาดในการเชื่อมต่อ"}` }]);
       }
     } catch (error) {
