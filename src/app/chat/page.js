@@ -393,6 +393,9 @@ export default function ChatPage() {
           >
             <option value="standard">🇹🇭 ภาษากลาง</option>
             <option value="local">🗣️ ภาษาถิ่น</option>
+            <option value="ayutthaya">🏰 แม่หญิงอยุธยา</option>
+            <option value="sukhothai">📜 สุโขทัยสไตล์</option>
+            <option value="palace">🌸 แม่หญิงชาววัง</option>
           </select>
           <select 
             value={theme} 
