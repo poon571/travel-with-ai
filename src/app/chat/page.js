@@ -48,6 +48,44 @@ const PlaceReviews = ({ query }) => {
   );
 };
 
+const MarkdownComponents = {
+  p: ({node, ...props}) => <div style={{ marginBottom: '0.8rem' }} {...props} />,
+  a: ({node, ...props}) => {
+    const href = props.href || '';
+    let rawQuery = null;
+    if (href.includes('google.com/maps/search/?api=1&query=')) {
+      rawQuery = href.split('query=')[1];
+    } else if (href.startsWith('https://map/?q=')) {
+      rawQuery = href.split('q=')[1];
+    } else if (href.includes('map:')) {
+      rawQuery = href.split('map:')[1];
+    }
+
+    if (rawQuery) {
+      // Replace underscores or pluses with spaces and decode
+      const query = decodeURIComponent(rawQuery.replace(/_/g, ' ').replace(/\+/g, ' '));
+      return (
+        <span key={query}>
+          <strong style={{ color: 'var(--text-color)', borderBottom: '2px solid #3b82f6' }}>{props.children}</strong>
+          <div style={{ marginTop: '0.8rem', marginBottom: '0.8rem', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+            <iframe 
+              width="100%" 
+              height="250" 
+              frameBorder="0" 
+              scrolling="no" 
+              marginHeight="0" 
+              marginWidth="0" 
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+            />
+          </div>
+          <PlaceReviews query={query} />
+        </span>
+      );
+    }
+    return <a {...props} target="_blank" rel="noopener noreferrer">{props.children}</a>;
+  }
+};
+
 export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -397,45 +435,7 @@ export default function ChatPage() {
                   )}
                 </div>
                 <div className={`${styles.messageContent} ${styles.markdown}`}>
-                  <ReactMarkdown
-                    components={{
-                      p: ({node, ...props}) => <div style={{ marginBottom: '0.8rem' }} {...props} />,
-                      a: ({node, ...props}) => {
-                        const href = props.href || '';
-                        let rawQuery = null;
-                        if (href.includes('google.com/maps/search/?api=1&query=')) {
-                          rawQuery = href.split('query=')[1];
-                        } else if (href.startsWith('https://map/?q=')) {
-                          rawQuery = href.split('q=')[1];
-                        } else if (href.includes('map:')) {
-                          rawQuery = href.split('map:')[1];
-                        }
-
-                        if (rawQuery) {
-                          // Replace underscores or pluses with spaces and decode
-                          const query = decodeURIComponent(rawQuery.replace(/_/g, ' ').replace(/\+/g, ' '));
-                          return (
-                            <span key={query}>
-                              <strong style={{ color: 'var(--text-color)', borderBottom: '2px solid #3b82f6' }}>{props.children}</strong>
-                              <div style={{ marginTop: '0.8rem', marginBottom: '0.8rem', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                                <iframe 
-                                  width="100%" 
-                                  height="250" 
-                                  frameBorder="0" 
-                                  scrolling="no" 
-                                  marginHeight="0" 
-                                  marginWidth="0" 
-                                  src={`https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
-                                />
-                              </div>
-                              <PlaceReviews query={query} />
-                            </span>
-                          );
-                        }
-                        return <a {...props} target="_blank" rel="noopener noreferrer">{props.children}</a>;
-                      }
-                    }}
-                  >
+                  <ReactMarkdown components={MarkdownComponents}>
                     {msg.text}
                   </ReactMarkdown>
                 </div>
