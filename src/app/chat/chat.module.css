@@ -371,7 +371,23 @@
   cursor: not-allowed;
 }
 
+.sidebarOverlay {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  .sidebarOverlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 90;
+    backdrop-filter: blur(2px);
+  }
+
   .sidebar {
     position: absolute;
     left: -260px;
