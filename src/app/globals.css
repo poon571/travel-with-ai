@@ -1,0 +1,105 @@
+:root {
+  /* Default Light Theme */
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --secondary-color: #10b981;
+  --accent-color: #f59e0b;
+  
+  --surface-color: #ffffff;
+  --surface-hover: #f1f5f9;
+  --border-color: #e2e8f0;
+  --input-bg: #f8fafc;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+body.theme-light {
+  background-color: var(--bg-color);
+}
+
+body.theme-dark {
+  --bg-color: #0f172a;
+  --text-color: #f8fafc;
+  --primary-color: #3b82f6;
+  --primary-hover: #60a5fa;
+  --secondary-color: #10b981;
+  
+  --surface-color: #1e293b;
+  --surface-hover: #334155;
+  --border-color: #334155;
+  --input-bg: #0f172a;
+}
+
+body.theme-beach {
+  --bg-color: #f0f8ff; /* Alice Blue */
+  --text-color: #1a202c;
+  --primary-color: #0ea5e9; /* Ocean Blue */
+  --primary-hover: #0284c7;
+  --secondary-color: #14b8a6; /* Teal */
+  --accent-color: #f59e0b; /* Sand Gold */
+  
+  --surface-color: #ffffff;
+  --surface-hover: #f8fafc;
+  --border-color: #bae6fd;
+  --input-bg: #f0f9ff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+input, textarea, select {
+  font-family: inherit;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.typing-indicator {
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+  color: #64748b;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
