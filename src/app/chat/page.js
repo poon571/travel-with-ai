@@ -91,6 +91,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [theme, setTheme] = useState("beach");
+  const [languageMode, setLanguageMode] = useState("standard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState("เชียงราย");
   const [menuOpenId, setMenuOpenId] = useState(null);
@@ -274,7 +275,8 @@ export default function ChatPage() {
           message: userMsg,
           history: messages,
           province: selectedProvince,
-          chatId: activeChatId
+          chatId: activeChatId,
+          languageMode: languageMode
         }),
       });
 
@@ -383,6 +385,15 @@ export default function ChatPage() {
         </div>
 
         <div className={styles.sidebarFooter}>
+          <select 
+            value={languageMode} 
+            onChange={(e) => setLanguageMode(e.target.value)}
+            className={styles.themeSelect}
+            style={{ marginBottom: '0.8rem' }}
+          >
+            <option value="standard">🇹🇭 ภาษากลาง</option>
+            <option value="local">🗣️ ภาษาถิ่น</option>
+          </select>
           <select 
             value={theme} 
             onChange={(e) => setTheme(e.target.value)}
