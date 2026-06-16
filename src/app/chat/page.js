@@ -96,6 +96,7 @@ export default function ChatPage() {
   const [selectedProvince, setSelectedProvince] = useState("เชียงราย");
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [deleteChatId, setDeleteChatId] = useState(null);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   
   // User Profile Settings
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -163,6 +164,21 @@ export default function ChatPage() {
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const res = await fetch("/api/user/delete", { method: "DELETE" });
+      if (res.ok) {
+        alert('ลบข้อมูลและบัญชีของคุณออกจากระบบเรียบร้อยแล้ว');
+        router.push("/login");
+      } else {
+        const data = await res.json();
+        alert('เกิดข้อผิดพลาด: ' + data.error);
+      }
+    } catch (err) {
+      alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+    }
   };
 
   const requestDeleteChat = (e, id) => {
@@ -415,6 +431,11 @@ export default function ChatPage() {
               <LogOut size={16} /> ออก
             </button>
           </div>
+          <div style={{ marginTop: '0.8rem', textAlign: 'center' }}>
+            <button onClick={() => setPrivacyOpen(true)} style={{ background: 'none', border: 'none', color: 'var(--text-color)', opacity: 0.7, fontSize: '0.8rem', cursor: 'pointer', textDecoration: 'underline' }}>
+              🛡️ นโยบายความเป็นส่วนตัว & เครดิต
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -578,6 +599,22 @@ export default function ChatPage() {
                     style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   />
                 </div>
+
+                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+                  <h4 style={{ color: '#ef4444', marginBottom: '0.5rem' }}>เขตอันตราย (Danger Zone)</h4>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-color)', opacity: 0.7, marginBottom: '0.8rem' }}>ตามนโยบาย PDPA คุณมีสิทธิลบข้อมูลส่วนบุคคลของคุณทั้งหมดออกจากระบบ (Right to Erasure)</p>
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (confirm('คำเตือน: การลบบัญชีจะเป็นการลบข้อมูลโปรไฟล์และการสนทนาทั้งหมดของคุณอย่างถาวร และไม่สามารถกู้คืนได้ คุณแน่ใจหรือไม่?')) {
+                        handleDeleteAccount();
+                      }
+                    }}
+                    style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '0.6rem 1rem', borderRadius: '8px', cursor: 'pointer', width: '100%', fontWeight: 'bold' }}
+                  >
+                    🗑️ ลบบัญชีและข้อมูลทั้งหมด
+                  </button>
+                </div>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -633,6 +670,35 @@ export default function ChatPage() {
                 disabled={isSavingSettings}
               >
                 {isSavingSettings ? 'กำลังบันทึก...' : 'บันทึกการตั้งค่า'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Privacy & Credits Modal */}
+      {privacyOpen && (
+        <div className={styles.modalOverlay} onClick={() => setPrivacyOpen(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+            <h3 style={{ marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>🛡️ นโยบายความเป็นส่วนตัว & เครดิต</h3>
+            
+            <div style={{ fontSize: '0.9rem', lineHeight: '1.6', maxHeight: '60vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
+              <h4 style={{ color: '#3b82f6', marginTop: '0.5rem' }}>นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)</h4>
+              <p>เราให้ความสำคัญกับความเป็นส่วนตัวของคุณ ข้อมูลรหัสผ่านจะถูกเข้ารหัส (Hashed) เพื่อความปลอดภัยสูงสุด ข้อมูลการสนทนาและประวัติการเดินทางจะถูกจัดเก็บเพื่อใช้ในการให้บริการของระบบเท่านั้น <strong>เราไม่มีนโยบายนำข้อมูลของคุณไปขายหรือเปิดเผยให้บุคคลที่สาม</strong></p>
+              <p>ผู้ใช้มีสิทธิลบข้อมูลทั้งหมดของตนเองออกจากระบบได้อย่างถาวรผ่านเมนู "ตั้งค่า"</p>
+
+              <h4 style={{ color: '#3b82f6', marginTop: '1.5rem' }}>เครดิตและลิขสิทธิ์ (Credits)</h4>
+              <ul style={{ paddingLeft: '1.5rem', listStyleType: 'disc' }}>
+                <li><strong>AI Engine:</strong> ขับเคลื่อนและประมวลผลโดย <a href="https://deepmind.google/technologies/gemini/" target="_blank" style={{ color: '#3b82f6' }}>Google Gemini API</a></li>
+                <li><strong>Map & Places Data:</strong> ข้อมูลแผนที่ รีวิว และการค้นหาสถานที่โดย <a href="https://developers.google.com/maps" target="_blank" style={{ color: '#3b82f6' }}>Google Maps Platform</a></li>
+                <li><strong>UI & Icons:</strong> พัฒนาด้วย React/Next.js และไอคอนจาก Lucide React</li>
+                <li><strong>Images & Assets:</strong> ภาพโปรไฟล์ AI และภาพพื้นหลังถูกสร้างขึ้นหรือนำมาจากแหล่งที่อนุญาตให้ใช้งานฟรี (Free-to-use / AI Generated)</li>
+              </ul>
+            </div>
+
+            <div className={styles.modalActions} style={{ marginTop: '1.5rem' }}>
+              <button className={styles.sendButton} style={{ padding: '0.5rem 1rem', borderRadius: '8px', color: '#fff', width: '100%' }} onClick={() => setPrivacyOpen(false)}>
+                รับทราบและปิดหน้าต่าง
               </button>
             </div>
           </div>
