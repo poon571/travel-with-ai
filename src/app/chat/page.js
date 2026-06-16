@@ -94,6 +94,8 @@ export default function ChatPage() {
   const [languageMode, setLanguageMode] = useState("standard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState("เชียงราย");
+  const [isIncognito, setIsIncognito] = useState(false);
+  const [incognitoAlertOpen, setIncognitoAlertOpen] = useState(false);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [deleteChatId, setDeleteChatId] = useState(null);
   const [privacyOpen, setPrivacyOpen] = useState(false);
@@ -292,7 +294,8 @@ export default function ChatPage() {
           history: messages,
           province: selectedProvince,
           chatId: activeChatId,
-          languageMode: languageMode
+          languageMode: languageMode,
+          isIncognito: isIncognito
         }),
       });
 
@@ -346,6 +349,20 @@ export default function ChatPage() {
         <div className={styles.sidebarHeader}>
           <button className={styles.newChatBtn} onClick={handleNewChat}>
             <Plus size={18} /> แชทใหม่
+          </button>
+          
+          <button 
+            onClick={() => {
+              const newState = !isIncognito;
+              setIsIncognito(newState);
+              if (newState) {
+                setIncognitoAlertOpen(true);
+              }
+            }}
+            className={styles.newChatBtn} 
+            style={{ marginTop: '0.8rem', backgroundColor: isIncognito ? '#ef4444' : 'var(--bg-color)', color: isIncognito ? 'white' : 'var(--text-color)', border: isIncognito ? 'none' : '1px solid var(--border-color)' }}
+          >
+            {isIncognito ? '👻 โหมดไร้ตัวตน (เปิด)' : '👻 โหมดไร้ตัวตน (ปิด)'}
           </button>
           
           <div className={styles.provinceSelector}>
@@ -441,11 +458,13 @@ export default function ChatPage() {
 
       {/* Main Area */}
       <main className={styles.main}>
-        <div className={styles.topbar}>
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: 'none', border: 'none', color: 'var(--text-color)' }}>
+        <div className={styles.topbar} style={{ backgroundColor: isIncognito ? '#ef4444' : 'var(--bg-color)', color: isIncognito ? 'white' : 'var(--text-color)', transition: 'background-color 0.3s' }}>
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: 'none', border: 'none', color: 'inherit' }}>
             <Menu size={24} />
           </button>
-          <span style={{ marginLeft: '1rem', fontWeight: 'bold' }}>เที่ยวกับไอ</span>
+          <span style={{ marginLeft: '1rem', fontWeight: 'bold' }}>
+            เที่ยวกับไอ {isIncognito && '(👻 โหมดไร้ตัวตน)'}
+          </span>
         </div>
 
         <div className={styles.chatContainer}>
@@ -521,6 +540,30 @@ export default function ChatPage() {
             <div className={styles.modalActions}>
               <button className={styles.cancelBtn} onClick={() => setDeleteChatId(null)}>ยกเลิก</button>
               <button className={styles.confirmDeleteBtn} onClick={confirmDeleteChat}>ลบแชท</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Incognito Alert Modal */}
+      {incognitoAlertOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIncognitoAlertOpen(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} style={{ borderTop: '4px solid #ef4444' }}>
+            <h3 style={{ color: '#ef4444', marginBottom: '1rem' }}>👻 โหมดไร้ตัวตนกำลังทำงาน!</h3>
+            <p style={{ lineHeight: '1.6', marginBottom: '1rem' }}>
+              ในโหมดนี้ ระบบหลังบ้านจะถูกสั่ง <strong>"ห้ามบันทึกประวัติการสนทนา"</strong> เด็ดขาด
+            </p>
+            <p style={{ lineHeight: '1.6', color: 'var(--text-color)', opacity: 0.8 }}>
+              ทันทีที่คุณรีเฟรช (F5) หรือปิดหน้าเว็บนี้ ข้อความแชททั้งหมดจะสูญหายอย่างถาวรเพื่อรักษาสิทธิความเป็นส่วนตัวของคุณครับ
+            </p>
+            <div className={styles.modalActions} style={{ marginTop: '1.5rem' }}>
+              <button 
+                className={styles.sendButton} 
+                style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', color: '#fff', width: '100%', backgroundColor: '#ef4444', fontWeight: 'bold' }} 
+                onClick={() => setIncognitoAlertOpen(false)}
+              >
+                เข้าใจแล้ว เริ่มแชทเลย!
+              </button>
             </div>
           </div>
         </div>

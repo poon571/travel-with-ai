@@ -113,17 +113,19 @@ export async function POST(req) {
       return response;
     }
 
-    const { message, history, province, chatId, languageMode } = await req.json();
+    const { message, history, province, chatId, languageMode, isIncognito } = await req.json();
     let activeChatId = chatId;
 
-    if (!activeChatId) {
-      const stmt = db.prepare('INSERT INTO chats (user_id, title) VALUES (?, ?)');
-      const info = stmt.run(user.id, `แพลนเที่ยว ${province || 'ไม่ระบุ'}`);
-      activeChatId = info.lastInsertRowid;
-    }
+    if (!isIncognito) {
+      if (!activeChatId) {
+        const stmt = db.prepare('INSERT INTO chats (user_id, title) VALUES (?, ?)');
+        const info = stmt.run(user.id, `แพลนเที่ยว ${province || 'ไม่ระบุ'}`);
+        activeChatId = info.lastInsertRowid;
+      }
 
-    // Save user message
-    db.prepare('INSERT INTO messages (chat_id, role, text) VALUES (?, ?, ?)').run(activeChatId, 'user', message);
+      // Save user message
+      db.prepare('INSERT INTO messages (chat_id, role, text) VALUES (?, ?, ?)').run(activeChatId, 'user', message);
+    }
 
     const provInfo = getProvinceInfo(province);
     const region = provInfo ? provInfo.region : "ประเทศไทย";
@@ -193,8 +195,10 @@ export async function POST(req) {
 
     const text = response.text();
 
-    // Save AI response
-    db.prepare('INSERT INTO messages (chat_id, role, text) VALUES (?, ?, ?)').run(activeChatId, 'ai', text);
+    if (!isIncognito) {
+      // Save AI response
+      db.prepare('INSERT INTO messages (chat_id, role, text) VALUES (?, ?, ?)').run(activeChatId, 'ai', text);
+    }
 
     return NextResponse.json({ text, chatId: activeChatId });
   } catch (error) {
